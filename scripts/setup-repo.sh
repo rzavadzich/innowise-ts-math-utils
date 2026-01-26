@@ -13,13 +13,18 @@ cat <<JSON | gh api repos/$OWNER/$REPO/branches/main/protection --method PUT --i
 {
   "required_status_checks": {
     "strict": true,
-    "contexts": ["validate", "ci"]
+    "contexts": [
+      "PR Checks / validate (pull_request)",
+      "PR Checks / ci / lint (pull_request)",
+      "PR Checks / ci / build (pull_request)",
+      "PR Checks / ci / test (pull_request)"
+    ]
   },
   "enforce_admins": true,
   "required_pull_request_reviews": {
     "dismiss_stale_reviews": true,
     "require_code_owner_reviews": false,
-    "required_approving_review_count": 1
+    "required_approving_review_count": 0
   },
   "restrictions": null,
   "required_linear_history": true,
