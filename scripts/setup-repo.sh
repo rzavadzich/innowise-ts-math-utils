@@ -34,7 +34,7 @@ cat <<JSON | gh api repos/$OWNER/$REPO/branches/main/protection --method PUT --i
 }
 JSON
 
-# 21.2 Implement labels
+# 21.2 Implement labels (auto-created if not exists)
 echo "Creating labels..."
 gh label create verify --color "006b96" --description "Run E2E tests" --force || true
 gh label create publish --color "0e8a16" --description "Prepare release candidate" --force || true
