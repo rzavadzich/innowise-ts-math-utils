@@ -66,7 +66,7 @@ test('package packs and installs correctly', async () => {
 
   // Cleanup tarball
   fs.unlinkSync(packPath);
-});
+}, 600000); // 10 minute timeout for CI where npm install can be slow
 
 // Cleanup temp dir
 afterAll(() => {
