@@ -14,6 +14,7 @@ jobs:
     with:
       tag: latest
       check-version-exists: true
+    secrets: inherit
 
   create-release:
     needs: publish
