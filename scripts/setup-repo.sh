@@ -7,17 +7,17 @@ REPO=$(echo $REPO_FULL_NAME | cut -d/ -f2)
 
 echo "Configuring branch protection for $REPO_FULL_NAME..."
 
-# 21.1 Implement branch protection API configuration
-# 23. Enhance repository setup script with linear history and up-to-date branch requirements
+# Use 'checks' instead of 'contexts' to correctly match GHA Check Runs
+# app_id 15368 is for GitHub Actions
 cat <<JSON | gh api repos/$OWNER/$REPO/branches/main/protection --method PUT --input -
 {
   "required_status_checks": {
     "strict": true,
     "checks": [
-      { "context": "PR Checks / validate (pull_request)" },
-      { "context": "PR Checks / ci / lint (pull_request)" },
-      { "context": "PR Checks / ci / build (pull_request)" },
-      { "context": "PR Checks / ci / test (pull_request)" }
+      { "context": "validate", "app_id": 15368 },
+      { "context": "ci / lint", "app_id": 15368 },
+      { "context": "ci / build", "app_id": 15368 },
+      { "context": "ci / test", "app_id": 15368 }
     ]
   },
   "enforce_admins": true,
