@@ -5,7 +5,12 @@ on:
     types: [labeled]
 
 jobs:
+  install:
+    if: github.event.label.name == 'verify'
+    uses: rzavadzich/innowise-ci-workflows/.github/workflows/node-setup.yml@main
+
   e2e:
+    needs: install
     if: github.event.label.name == 'verify'
     runs-on: ubuntu-latest
     steps:
@@ -14,11 +19,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
 
-      - run: npm ci
-      - run: npm run test:e2e --if-present
-        # Fallback if specific script doesn't exist yet, run regular test which includes e2e
+      - uses: actions/download-artifact@v4
+        with:
+          name: node-modules-${{ github.run_id }}
+          path: node_modules
+
+      - name: Run E2E tests
+        run: npm run test:e2e --if-present
         continue-on-error: true
-      - run: npm test
+
+      - name: Run all tests
+        run: npm test
