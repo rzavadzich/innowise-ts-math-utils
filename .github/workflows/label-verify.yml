@@ -25,6 +25,9 @@ jobs:
           name: node-modules-${{ github.run_id }}
           path: node_modules
 
+      - name: Rebuild bin links
+        run: npm rebuild
+
       - name: Run E2E tests
         run: npm run test:e2e --if-present
         continue-on-error: true
