@@ -1,0 +1,45 @@
+name: Publish Label
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  check-version:
+    if: github.event.label.name == 'publish'
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Check version
+        id: check
+        run: |
+          VERSION=$(npm pkg get version | tr -d '"')
+          PACKAGE_NAME=$(npm pkg get name | tr -d '"')
+          echo "Checking version $VERSION for $PACKAGE_NAME"
+
+          if npm view "$PACKAGE_NAME@$VERSION" --registry=https://npm.pkg.github.com > /dev/null 2>&1; then
+            echo "Version $VERSION already exists!"
+            echo "exists=true" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "Version $VERSION is available."
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-rc:
+    needs: check-version
+    if: needs.check-version.outputs.exists == 'false'
+    uses: rzavadzich/innowise-ci-workflows/.github/workflows/npm-publish.yml@main
+    with:
+      tag: 'rc'
+      registry: 'https://npm.pkg.github.com'
