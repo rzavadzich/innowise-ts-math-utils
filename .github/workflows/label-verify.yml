@@ -15,10 +15,13 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
 
-      - run: npm ci
-      - run: npm run test:e2e --if-present
-        # Fallback if specific script doesn't exist yet, run regular test which includes e2e
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run E2E tests
+        run: npm run test:e2e --if-present
         continue-on-error: true
-      - run: npm test
+
+      - name: Run all tests
+        run: npm test

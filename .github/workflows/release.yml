@@ -6,33 +6,24 @@ on:
       - main
 
 jobs:
-  release:
+  publish:
     if: |
-      contains(github.event.head_commit.message, 'publish') || 
+      contains(github.event.head_commit.message, 'publish') ||
       contains(github.event.head_commit.message, 'release')
+    uses: rzavadzich/innowise-ci-workflows/.github/workflows/npm-publish.yml@main
+    with:
+      tag: latest
+      check-version-exists: true
+
+  create-release:
+    needs: publish
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          registry-url: 'https://npm.pkg.github.com'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
-      - run: npm ci
-      - run: npm run build
-
-      - name: Publish to npm
-        run: npm publish --tag latest
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
+      - name: Create Git Tag and GitHub Release
         run: |
           VERSION=$(npm pkg get version | tr -d '"')
           git config user.name "github-actions[bot]"
