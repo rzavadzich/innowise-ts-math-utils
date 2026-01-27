@@ -2,11 +2,11 @@ name: Verify Label
 
 on:
   pull_request:
-    types: [labeled]
+    types: [labeled, synchronize]
 
 jobs:
   e2e:
-    if: github.event.label.name == 'verify'
+    if: contains(github.event.pull_request.labels.*.name, 'verify')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
