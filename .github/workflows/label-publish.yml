@@ -19,7 +19,6 @@ jobs:
 
   publish-rc:
     needs: get-sha
-    if: github.event.label.name == 'publish'
     uses: rzavadzich/innowise-ci-workflows/.github/workflows/npm-publish.yml@main
     with:
       tag: rc

@@ -14,6 +14,7 @@ cat <<JSON | gh api repos/$OWNER/$REPO/branches/main/protection --method PUT --i
   "required_status_checks": {
     "strict": true,
     "checks": [
+      { "context": "version-check", "app_id": 15368 },
       { "context": "validate", "app_id": 15368 },
       { "context": "ci / lint", "app_id": 15368 },
       { "context": "ci / build", "app_id": 15368 },

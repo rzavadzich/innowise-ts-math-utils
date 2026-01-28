@@ -20,8 +20,4 @@ jobs:
         run: npm ci
 
       - name: Run E2E tests
-        run: npm run test:e2e --if-present
-        continue-on-error: true
-
-      - name: Run all tests
-        run: npm test
+        run: npm run test:e2e
