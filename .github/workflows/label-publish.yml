@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [labeled]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   get-sha:
     if: github.event.label.name == 'publish'
@@ -24,3 +28,4 @@ jobs:
       tag: rc
       version-suffix: '-dev-${{ needs.get-sha.outputs.short-sha }}'
       check-version-exists: true
+    secrets: inherit
