@@ -9,23 +9,11 @@ permissions:
   packages: write
 
 jobs:
-  get-sha:
-    if: github.event.label.name == 'publish'
-    runs-on: ubuntu-latest
-    outputs:
-      short-sha: ${{ steps.sha.outputs.short }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - id: sha
-        run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
   publish-rc:
-    needs: get-sha
+    if: github.event.label.name == 'publish'
     uses: rzavadzich/innowise-ci-workflows/.github/workflows/npm-publish.yml@main
     with:
       tag: rc
-      version-suffix: '-dev-${{ needs.get-sha.outputs.short-sha }}'
+      version-suffix: '-dev-${{ github.sha }}'
       check-version-exists: true
     secrets: inherit
