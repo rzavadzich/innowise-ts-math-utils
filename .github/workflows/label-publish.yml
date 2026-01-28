@@ -14,6 +14,6 @@ jobs:
     uses: rzavadzich/innowise-ci-workflows/.github/workflows/npm-publish.yml@main
     with:
       tag: rc
-      version-suffix: '-dev-${{ github.event.pull_request.head.sha }}'
+      version-suffix: '-dev-${{ github.sha }}'
       check-version-exists: true
     secrets: inherit
