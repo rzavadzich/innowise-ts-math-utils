@@ -7,6 +7,24 @@ on:
       - main
 
 jobs:
+  check-publish-label:
+    runs-on: ubuntu-latest
+    outputs:
+      should-publish: ${{ steps.check.outputs.has-label }}
+    steps:
+      - name: Check if merged PR had publish label
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --state merged --search "${{ github.sha }}" --json number --jq '.[0].number')
+          if [ -z "$PR_NUMBER" ]; then
+            echo "has-label=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          HAS_LABEL=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[].name' | grep -c '^publish$' || true)
+          echo "has-label=$( [ "$HAS_LABEL" -gt 0 ] && echo true || echo false )" >> $GITHUB_OUTPUT
+
   publish:
     if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'publish')
     permissions:
