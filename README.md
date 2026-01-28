@@ -2,7 +2,7 @@
 
 A TypeScript math utilities library with a fully automated CI/CD pipeline.
 
-## Overview
+## Overview of this project
 
 This package provides type-safe mathematical utility functions for TypeScript/JavaScript projects. It serves as a reference implementation demonstrating modern CI/CD practices with GitHub Actions, including dual ESM/CJS builds and label-driven releases.
 
