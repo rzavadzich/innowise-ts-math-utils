@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [labeled]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   get-sha:
     if: github.event.label.name == 'publish'
@@ -19,9 +23,9 @@ jobs:
 
   publish-rc:
     needs: get-sha
-    if: github.event.label.name == 'publish'
     uses: rzavadzich/innowise-ci-workflows/.github/workflows/npm-publish.yml@main
     with:
       tag: rc
       version-suffix: '-dev-${{ needs.get-sha.outputs.short-sha }}'
       check-version-exists: true
+    secrets: inherit

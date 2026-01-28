@@ -6,10 +6,27 @@ on:
       - main
 
 jobs:
+  check-publish-label:
+    runs-on: ubuntu-latest
+    outputs:
+      should-publish: ${{ steps.check.outputs.has-label }}
+    steps:
+      - name: Check if merged PR had publish label
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --state merged --search "${{ github.sha }}" --json number --jq '.[0].number')
+          if [ -z "$PR_NUMBER" ]; then
+            echo "has-label=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          HAS_LABEL=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[].name' | grep -c '^publish$' || true)
+          echo "has-label=$( [ "$HAS_LABEL" -gt 0 ] && echo true || echo false )" >> $GITHUB_OUTPUT
+
   publish:
-    if: |
-      contains(github.event.head_commit.message, 'publish') ||
-      contains(github.event.head_commit.message, 'release')
+    needs: check-publish-label
+    if: needs.check-publish-label.outputs.should-publish == 'true'
     permissions:
       contents: read
       packages: write
@@ -20,20 +37,9 @@ jobs:
     secrets: inherit
 
   create-release:
-    needs: publish
-    runs-on: ubuntu-latest
+    needs: [check-publish-label, publish]
+    if: needs.check-publish-label.outputs.should-publish == 'true'
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Create Git Tag and GitHub Release
-        run: |
-          VERSION=$(npm pkg get version | tr -d '"')
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "v$VERSION"
-          git push origin "v$VERSION"
-          gh release create "v$VERSION" --generate-notes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: rzavadzich/innowise-ci-workflows/.github/workflows/create-release.yml@main
+    secrets: inherit
