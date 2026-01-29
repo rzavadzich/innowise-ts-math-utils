@@ -8,7 +8,7 @@ TypeScript math utilities with automated CI/CD pipeline.
 npm install @rzavadzich/innowise-ts-math-utils
 ```
 
-## Usage
+## Usage of the app
 
 ```typescript
 import { sum } from '@rzavadzich/innowise-ts-math-utils';
