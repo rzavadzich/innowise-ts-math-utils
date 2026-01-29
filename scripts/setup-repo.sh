@@ -7,18 +7,16 @@ REPO=$(echo $REPO_FULL_NAME | cut -d/ -f2)
 
 echo "Configuring branch protection for $REPO_FULL_NAME..."
 
-# Use 'checks' instead of 'contexts' to correctly match GHA Check Runs
-# app_id 15368 is for GitHub Actions
 cat <<JSON | gh api repos/$OWNER/$REPO/branches/main/protection --method PUT --input -
 {
   "required_status_checks": {
     "strict": true,
     "checks": [
-      { "context": "version-check", "app_id": 15368 },
-      { "context": "validate", "app_id": 15368 },
-      { "context": "ci / lint", "app_id": 15368 },
-      { "context": "ci / build", "app_id": 15368 },
-      { "context": "ci / test", "app_id": 15368 }
+      { "context": "version-check" },
+      { "context": "validate" },
+      { "context": "ci / lint" },
+      { "context": "ci / build" },
+      { "context": "ci / test" }
     ]
   },
   "enforce_admins": true,
@@ -35,7 +33,6 @@ cat <<JSON | gh api repos/$OWNER/$REPO/branches/main/protection --method PUT --i
 }
 JSON
 
-# 21.2 Implement labels (auto-created if not exists)
 echo "Creating labels..."
 gh label create verify --color "006b96" --description "Run E2E tests" --force || true
 gh label create publish --color "0e8a16" --description "Prepare release candidate" --force || true
